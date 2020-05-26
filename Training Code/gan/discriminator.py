@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sc
 from torchvision import transforms, datasets
 from rnn_audio import RNN
-from encoder_image import Image_Encoder
+from image_encoder import Image_Encoder
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F

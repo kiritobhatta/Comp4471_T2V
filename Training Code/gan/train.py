@@ -11,11 +11,11 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from skimage import transform as tf
 from rnn_audio import RNN
-from encoder_image import Image_Encoder
+from image_encoder import Image_Encoder
 import os
 import time
 import face_alignment
-from encoder_audio import Audio_Encoder
+from audio_encoder import Audio_Encoder
 from img_generator import UnetBlock
 from discriminator import FrameDiscriminator, SequenceDiscriminator
 from dataloader import get_data

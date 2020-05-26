@@ -9,7 +9,7 @@ from torch.autograd import Variable
 # Identity Encoder and Frame Decoder
 from config import (NOISE_OUTPUT, HIDDEN_SIZE_NOISE, NUM_LAYERS_NOISE)
 
-from encoder_audio import Audio_Encoder
+from audio_encoder import Audio_Encoder
 
 class Down(nn.Module):
     def __init__(self, in_ch, out_ch, kernel_x, kernel_y, stride, padding, cuda=False):

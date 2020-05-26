@@ -1,6 +1,6 @@
 from torchvision import transforms
 import torch
-from encoder_image import Encoder
+from image_encoder import Image_Encoder
 from img_generator import Generator
 from rnn_audio import RNN
 
@@ -45,10 +45,6 @@ def tempdir():
 def get_audio_feature_extractor(model_path="grid", gpu=-1):
     if model_path == "grid":
         model_path = os.path.split(__file__)[0] + "/data/grid.dat"
-    elif model_path == "timit":
-        model_path = os.path.split(__file__)[0] + "/data/timit.dat"
-    elif model_path == "crema":
-        model_path = os.path.split(__file__)[0] + "/data/crema.dat"
 
     if gpu < 0:
         device = torch.device("cpu")
@@ -95,10 +91,6 @@ class VideoAnimator():
 
         if model_path == "grid":
             model_path = os.path.split(__file__)[0] + "/data/grid.dat"
-        elif model_path == "timit":
-            model_path = os.path.split(__file__)[0] + "/data/timit.dat"
-        elif model_path == "crema":
-            model_path = os.path.split(__file__)[0] + "/data/crema.dat"
 
         if gpu < 0:
             self.device = torch.device("cpu")
@@ -135,7 +127,7 @@ class VideoAnimator():
         self.encoder.to(self.device)
         self.encoder.load_state_dict(model_dict['encoder'])
 
-        self.encoder_id = Encoder(self.id_enc_dim, self.img_size)
+        self.encoder_id = Image_Encoder(self.id_enc_dim, self.img_size)
         self.encoder_id.to(self.device)
         self.encoder_id.load_state_dict(model_dict['encoder_id'])
 
@@ -224,12 +216,10 @@ class VideoAnimator():
             frame = np.array(frm)
         else:
             frame = img
-
         if not aligned:
             frame = self.preprocess_img(frame)
-
+        print(frame.shape)
         if isinstance(audio, str):  # if we have a path then grab the audio clip
-            print(audio)
             info = mediainfo(audio)
             fs = int(info['sample_rate'])
             audio = np.array(AudioSegment.from_file(audio, info['format_name']).set_channels(1).get_array_of_samples())
@@ -249,6 +239,7 @@ class VideoAnimator():
             audio = audio[:, 0]
 
         max_value = np.iinfo(audio.dtype).max
+        
         if fs != self.audio_rate:
             seq_length = audio.shape[0]
             speech = torch.from_numpy(
@@ -258,8 +249,10 @@ class VideoAnimator():
             audio = torch.from_numpy(audio / float(max_value)).float()
             speech = audio.view(-1, 1)
 
+        #print("audio", speech.shape)e
+        
         frame = self.img_transform(frame).to(self.device)
-
+        
         cutting_stride = int(self.audio_rate / float(self.video_rate))
         audio_seq_padding = self.audio_feat_samples - cutting_stride
 
@@ -270,16 +263,25 @@ class VideoAnimator():
         audio_feat_seq_length = audio_feat_seq.size()[1]
 
         z = self.encoder(audio_feat_seq, [audio_feat_seq_length])  # Encoding for the motion
+        #print(audio_feat_seq.shape)
+        #print(audio_feat_seq_length)
         noise = torch.FloatTensor(1, audio_feat_seq_length, self.aux_latent).normal_(0, 0.33).to(self.device)
         z_id, skips = self.encoder_id(frame, retain_intermediate=True)
         skip_connections = []
-        for skip_variable in skips:
+
+        for skip_variable in skips: 
             skip_connections.append(self._broadcast_elements_(skip_variable, z.size()[1]))
         skip_connections.reverse()
 
         z_id = self._broadcast_elements_(z_id, z.size()[1])
+        #print("values")
+        #print(z.shape)
+        #print(z_id.shape)
+        #print(noise.shape)
+        #print(len(skip_connections))
+        # print(skip_connections[0])
         gen_video = self.generator(z, c=z_id, aux=noise, skip=skip_connections)
-
+        print("gen_video:", gen_video.shape)
         returned_audio = ((2 ** 15) * speech.detach().cpu().numpy()).astype(np.int16)
         gen_video = 125 * gen_video.squeeze().detach().cpu().numpy() + 125
         return gen_video, returned_audio
