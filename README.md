@@ -8,7 +8,7 @@ In case we include the TCD-TIMIT dataset. Please include:
 Harte, N.; Gillen, E., "TCD-TIMIT: An Audio-Visual Corpus of Continuous Speech," Multimedia, IEEE Transactions on , vol.17, no.5, pp.603,615, May 2015 doi: 10.1109/TMM.2015.2407694
 as reference.
 ```
-## Demo Video available for the website
+**Demo Video available for the website
 
 # For the Website
 ## Dependencies
