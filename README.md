@@ -1,4 +1,7 @@
 # Comp4471_T2V
+```
+This project was implemented as a course requirement for COMP4471 Spring 2020 offering. 
+```
 
 ## Acknowledgement
 ```
