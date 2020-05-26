@@ -1,7 +1,5 @@
 # Comp4471_T2V
 
-## note that the models were not pushed to this repo as it take a huge space.
-
 ## Acknowledgement
 ```
 In case we include the TCD-TIMIT dataset. Please include:
@@ -25,3 +23,5 @@ $ pip install .
 3. run the code "python3 app.py"
 4. Open your chrome and in your browser type "http://127.0.0.1:5000/"
 ```
+
+## Note that the models were not pushed to this repo as it requires huge space.
